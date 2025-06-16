@@ -16,28 +16,29 @@ const (
 	walkingCaloriesCoefficient = 0.5  // коэффициент для расчета калорий при ходьбе
 )
 
+// Разбор строки
 func parseTraining(data string) (int, string, time.Duration, error) {
 	trainToSlice := strings.Split(data, ",")
 	if len(trainToSlice) != 3 {
-		return 0, "", 0, fmt.Errorf("некорректные входные данные 2")
+		return 0, "", 0, fmt.Errorf("wrong incoming format")
 	}
 
-	steps, err := strconv.Atoi(trainToSlice[0])
+	steps, err := strconv.Atoi(trainToSlice[0]) // получение количества шагов
 	if err != nil {
-		return 0, "", 0, fmt.Errorf("некорректное количество шагов тренировки")
+		return 0, "", 0, fmt.Errorf("wrong incoming steps")
 	}
 	if steps <= 0 {
-		return 0, "", 0, fmt.Errorf("нулевое или отрицательное количество шагов")
+		return 0, "", 0, fmt.Errorf("zero or negative number of steps")
 	}
 
-	timer, err := time.ParseDuration(trainToSlice[2])
+	timer, err := time.ParseDuration(trainToSlice[2]) // получение времени
 	if err != nil {
-		return 0, "", 0, fmt.Errorf("некорректное время тренировки")
+		return 0, "", 0, fmt.Errorf("incorrect training time")
 	}
 	if timer <= 0 {
-		return 0, "", 0, fmt.Errorf("нулевое или отрицательное время")
+		return 0, "", 0, fmt.Errorf("zero or negative time")
 	}
-	activ := trainToSlice[1]
+	activ := trainToSlice[1] // получение вида активности
 	return steps, activ, timer, nil
 }
 
@@ -57,6 +58,7 @@ func meanSpeed(steps int, height float64, duration time.Duration) float64 {
 
 }
 
+// Получение информации о тренировке
 func TrainingInfo(data string, weight, height float64) (string, error) {
 	steps, activ, duration, err := parseTraining(data)
 	if err != nil {
@@ -100,17 +102,19 @@ func TrainingInfo(data string, weight, height float64) (string, error) {
 	}
 }
 
+// Вычисление калорий при ходьбе
 func RunningSpentCalories(steps int, weight, height float64, duration time.Duration) (float64, error) {
 	if steps <= 0 || duration <= 0 || weight <= 0 || height <= 0 {
-		return 0, fmt.Errorf("ошибка входных данных")
+		return 0, fmt.Errorf("wrong incoming format")
 	}
 	durationInMinutes := duration.Minutes()
 	return (weight * meanSpeed(steps, height, duration) * durationInMinutes) / minInH, nil
 }
 
+// Вычисление калорий при беге
 func WalkingSpentCalories(steps int, weight, height float64, duration time.Duration) (float64, error) {
 	if steps <= 0 || duration <= 0 || weight <= 0 || height <= 0 {
-		return 0, fmt.Errorf("ошибка входных данных")
+		return 0, fmt.Errorf("wrong incoming format")
 	}
 	durationInMinutes := duration.Minutes()
 	return ((weight * meanSpeed(steps, height, duration) * durationInMinutes) / minInH) * walkingCaloriesCoefficient, nil
